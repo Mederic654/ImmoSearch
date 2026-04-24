@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes visites — ImmoSearch{% endblock %}
+
+{% block body %}
+    <h1>Mes demandes de visite</h1>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Bien</th><th>Date</th><th>Statut</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for v in visites %}
+            <tr>
+                <td><a href="{{ path('app_bien_show', {'id': v.bien.id}) }}">{{ v.bien.titre }}</a></td>
+                <td>{{ v.dateVisite|date('d/m/Y H:i') }}</td>
+                <td><span class="badge badge-{{ v.statut }}">{{ v.statut|capitalize }}</span></td>
+            </tr>
+        {% else %}
+            <tr><td colspan="3">Aucune visite demandée.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

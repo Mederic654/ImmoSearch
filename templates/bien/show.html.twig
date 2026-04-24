@@ -1,0 +1,234 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ bien.titre }} — ImmoSearch{% endblock %}
+
+{% block body %}
+    {# ===== Top bar ===== #}
+    <div class="container">
+        <div class="detail-topbar">
+            <a href="{{ path('app_home') }}" class="detail-back">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15,18 9,12 15,6"/></svg>
+                Retour aux résultats
+            </a>
+            <div class="detail-actions">
+                <button type="button">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                    Sauvegarder
+                </button>
+                <button type="button">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+                    Partager
+                </button>
+            </div>
+        </div>
+
+        {# ===== Galerie ===== #}
+        <div class="gallery">
+            {% set photos = bien.photos|slice(0, 5) %}
+            <div class="gallery-item main">
+                {% if photos|length > 0 %}
+                    <img src="{{ asset('uploads/' ~ photos[0].url) }}" alt="{{ bien.titre }}">
+                {% else %}
+                    Vue principale de la propriété
+                {% endif %}
+                <span class="gallery-tag">
+                    {% if bien.statut == 'loue' or bien.statut == 'disponible' %}À vendre{% else %}{{ bien.statut|replace({'_': ' '})|capitalize }}{% endif %}
+                </span>
+            </div>
+            {% for i in 1..4 %}
+                <div class="gallery-item">
+                    {% if photos[i] is defined %}
+                        <img src="{{ asset('uploads/' ~ photos[i].url) }}" alt="{{ bien.titre }} {{ i+1 }}">
+                    {% else %}
+                        {% set labels = ['Façade de l\'immeuble', 'Entrée principale', 'Cour intérieure', 'Vue latérale'] %}
+                        {{ labels[i-1] }}
+                    {% endif %}
+                    {% if i == 4 and bien.photos|length > 5 %}
+                        <span class="gallery-more">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21,15 16,10 5,21"/></svg>
+                            Voir les {{ bien.photos|length }} photos
+                        </span>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+
+        {# ===== Grille principale ===== #}
+        <div class="detail-grid">
+            <div>
+                <h1 class="detail-price">{{ bien.prix|number_format(0, ',', ' ') }} €</h1>
+                <p class="detail-address">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -2px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    {{ bien.adresse.rue ?? '' }}{% if bien.adresse.rue %}, {% endif %}{{ bien.adresse.codePostal ?? '' }} {{ bien.adresse.ville }}
+                </p>
+
+                <div class="detail-stats">
+                    <div class="detail-stat">
+                        <span class="v">{{ bien.caracteristique.nbrPiece ?? '—' }}</span>
+                        <span class="l">Pièce{{ (bien.caracteristique.nbrPiece ?? 0) > 1 ? 's' : '' }}</span>
+                    </div>
+                    <div class="detail-stat">
+                        <span class="v">{{ bien.caracteristique.nbrChambre ?? '—' }}</span>
+                        <span class="l">Chambre{{ (bien.caracteristique.nbrChambre ?? 0) > 1 ? 's' : '' }}</span>
+                    </div>
+                    <div class="detail-stat">
+                        <span class="v">{{ bien.surface }}</span>
+                        <span class="l">m²</span>
+                    </div>
+                </div>
+
+                <div class="detail-charac">
+                    <div class="item">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12 12 3l9 9"/><path d="M5 10v10h14V10"/></svg>
+                        {{ bien.caracteristique.type|capitalize }}
+                    </div>
+                    {% if bien.caracteristique.etage is not null %}
+                        <div class="item">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="20" x2="21" y2="20"/><line x1="3" y1="4" x2="21" y2="4"/><line x1="3" y1="12" x2="21" y2="12"/></svg>
+                            {% if bien.caracteristique.etage == 0 %}Rez-de-chaussée{% else %}{{ bien.caracteristique.etage }}{{ bien.caracteristique.etage == 1 ? 'er' : 'ème' }} étage{% endif %}
+                        </div>
+                    {% endif %}
+                    {% if bien.caracteristique.ascenseur %}
+                        <div class="item">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="7 13 12 18 17 13"/><polyline points="7 6 12 11 17 6"/></svg>
+                            Avec ascenseur
+                        </div>
+                    {% endif %}
+                    {% if bien.caracteristique.energie %}
+                        <div class="item">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                            DPE : {{ bien.caracteristique.energie }}
+                        </div>
+                    {% endif %}
+                    <div class="item">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                        {{ (bien.prix / bien.surface)|round|number_format(0, ',', ' ') }} €/m²
+                    </div>
+                </div>
+
+                <section class="detail-section">
+                    <h2>Description du bien</h2>
+                    <p>{{ bien.description|default('Aucune description disponible.')|nl2br }}</p>
+                </section>
+
+                <section class="detail-section">
+                    <h2>Caractéristiques</h2>
+                    <div class="features-grid">
+                        {% set features = [
+                            { lbl: 'Balcon', val: bien.caracteristique.balcon ? 'Présent' : null },
+                            { lbl: 'Cave', val: bien.caracteristique.cave ? 'Incluse' : null },
+                            { lbl: 'Ascenseur', val: bien.caracteristique.ascenseur ? 'Disponible' : null },
+                            { lbl: 'Chauffage', val: bien.caracteristique.chauffage ? bien.caracteristique.chauffage|capitalize : null },
+                            { lbl: 'Jardin', val: bien.caracteristique.jardin ? 'Privatif' : null },
+                            { lbl: 'Parking', val: bien.caracteristique.parking ? 'Disponible' : null },
+                            { lbl: 'Garage', val: bien.caracteristique.garage ? 'Disponible' : null },
+                            { lbl: 'Meublé', val: bien.caracteristique.meuble ? 'Oui' : null }
+                        ] %}
+                        {% for f in features %}
+                            {% if f.val %}
+                                <div class="item">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                                    <div>
+                                        <span class="lbl">{{ f.lbl }}</span>
+                                        <span class="val">{{ f.val }}</span>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </section>
+
+                <section class="detail-section">
+                    <h2>Localisation</h2>
+                    <div class="map-zone" style="height: 220px;">
+                        Carte interactive de la localisation
+                    </div>
+                    <div class="poi-grid">
+                        <div class="poi-card">
+                            <div class="t"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="13" rx="2"/><circle cx="8" cy="20" r="1.5"/><circle cx="16" cy="20" r="1.5"/></svg> Transports</div>
+                            <div>Stations à proximité</div>
+                        </div>
+                        <div class="poi-card">
+                            <div class="t"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21V10l9-7 9 7v11h-7v-7h-4v7z"/></svg> Écoles</div>
+                            <div>Écoles à proximité</div>
+                        </div>
+                        <div class="poi-card">
+                            <div class="t"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg> Commerces</div>
+                            <div>Commerces de proximité</div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            {# ===== Sidebar agence ===== #}
+            <aside>
+                <div class="agency-card">
+                    <h3 style="margin-bottom: .85rem; font-size: .95rem;">Contactez l'agence</h3>
+                    <div class="agency-head">
+                        <div class="agency-avatar">{{ bien.agence.nom|slice(0, 1)|upper }}</div>
+                        <div>
+                            <div class="agency-name">{{ bien.agence.nom }}</div>
+                            <div class="agency-role">Agent immobilier</div>
+                            <div class="agency-rating">★★★★★ (4.2)</div>
+                        </div>
+                    </div>
+
+                    {% if app.user %}
+                        {{ form_start(visiteForm) }}
+                            {{ form_widget(visiteForm.dateVisite, {'attr': {'style': 'margin-bottom: .6rem;'}}) }}
+                            <button type="submit" class="btn-primary">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                                Planifier une visite
+                            </button>
+                        {{ form_end(visiteForm) }}
+                    {% else %}
+                        <a href="{{ path('app_login') }}" class="btn-primary">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                            Planifier une visite
+                        </a>
+                    {% endif %}
+
+                    {% if bien.agence.telephone %}
+                        <a href="tel:{{ bien.agence.telephone }}" class="btn-outline">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                            Appeler l'agence
+                        </a>
+                    {% endif %}
+                    {% if bien.agence.email %}
+                        <a href="mailto:{{ bien.agence.email }}" class="btn-outline">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                            Envoyer un message
+                        </a>
+                    {% endif %}
+
+                    <p class="agency-note">En soumettant ce formulaire, vous acceptez d'être contacté par l'agence.</p>
+                    <div class="agency-trust">
+                        <span>🔒 Sécurisé</span>
+                        <span>Confidentiel</span>
+                    </div>
+                </div>
+
+                <div class="know-card">
+                    <h4>💡 Bon à savoir</h4>
+                    <ul>
+                        <li>✓ Visites possibles 7/7</li>
+                        <li>✓ Réponse sous 24h</li>
+                        <li>✓ Visite virtuelle disponible</li>
+                    </ul>
+                </div>
+            </aside>
+        </div>
+
+        {# ===== Biens similaires ===== #}
+        {% if similaires|length > 0 %}
+            <section class="detail-section" style="margin-top: 2rem;">
+                <h2>Biens similaires</h2>
+                <div class="bien-grid">
+                    {% for sim in similaires %}
+                        {% include 'components/_bien_card.html.twig' with {'bien': sim} %}
+                    {% endfor %}
+                </div>
+            </section>
+        {% endif %}
+    </div>
+{% endblock %}
