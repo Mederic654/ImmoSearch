@@ -1,0 +1,50 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ bien.id ? 'Éditer' : 'Nouveau' }} bien — ImmoSearch{% endblock %}
+
+{% block body %}
+    <h1>{{ bien.id ? 'Éditer un bien' : 'Créer un bien' }}</h1>
+
+    {{ form_start(form) }}
+    <fieldset>
+        <legend>Informations</legend>
+        {{ form_row(form.titre) }}
+        {{ form_row(form.description) }}
+        {{ form_row(form.prix) }}
+        {{ form_row(form.surface) }}
+        {{ form_row(form.statut) }}
+        {{ form_row(form.agence) }}
+    </fieldset>
+
+    <fieldset>
+        <legend>Adresse</legend>
+        {{ form_row(form.adresse.rue) }}
+        {{ form_row(form.adresse.ville) }}
+        {{ form_row(form.adresse.codePostal) }}
+    </fieldset>
+
+    <fieldset>
+        <legend>Caractéristiques</legend>
+        <div class="form-grid">
+            {{ form_row(form.caracteristique.type) }}
+            {{ form_row(form.caracteristique.nbrPiece) }}
+            {{ form_row(form.caracteristique.nbrChambre) }}
+            {{ form_row(form.caracteristique.etage) }}
+            {{ form_row(form.caracteristique.energie) }}
+            {{ form_row(form.caracteristique.chauffage) }}
+        </div>
+        <div class="form-grid">
+            {{ form_row(form.caracteristique.balcon) }}
+            {{ form_row(form.caracteristique.meuble) }}
+            {{ form_row(form.caracteristique.cave) }}
+            {{ form_row(form.caracteristique.ascenseur) }}
+            {{ form_row(form.caracteristique.jardin) }}
+            {{ form_row(form.caracteristique.parking) }}
+            {{ form_row(form.caracteristique.garage) }}
+        </div>
+    </fieldset>
+
+    <button type="submit" class="btn-primary">Enregistrer</button>
+    <a href="{{ path('app_agent_bien_index') }}">Annuler</a>
+    {{ form_end(form) }}
+{% endblock %}

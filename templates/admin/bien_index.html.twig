@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des biens — ImmoSearch{% endblock %}
+
+{% block body %}
+    <div class="page-header">
+        <h1>Gestion des biens</h1>
+        <a href="{{ path('app_agent_bien_new') }}" class="btn-primary">+ Nouveau bien</a>
+    </div>
+
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Titre</th><th>Ville</th><th>Prix</th><th>Surface</th><th>Statut</th><th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for bien in biens %}
+            <tr>
+                <td><a href="{{ path('app_bien_show', {'id': bien.id}) }}">{{ bien.titre }}</a></td>
+                <td>{{ bien.adresse.ville }}</td>
+                <td>{{ bien.prix|number_format(0, ',', ' ') }} €</td>
+                <td>{{ bien.surface }} m²</td>
+                <td>{{ bien.statut|replace({'_': ' '})|capitalize }}</td>
+                <td>
+                    <a href="{{ path('app_agent_bien_edit', {'id': bien.id}) }}" class="btn-small">Éditer</a>
+                    <form method="post" action="{{ path('app_agent_bien_delete', {'id': bien.id}) }}" class="inline-form" onsubmit="return confirm('Supprimer ce bien ?');">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ bien.id) }}">
+                        <button class="btn-small btn-danger">Supprimer</button>
+                    </form>
+                </td>
+            </tr>
+        {% else %}
+            <tr><td colspan="6">Aucun bien.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
